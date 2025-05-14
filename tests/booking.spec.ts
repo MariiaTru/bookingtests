@@ -1,42 +1,40 @@
 import { test, expect } from '@playwright/test';
+import {Homepage} from './pages/homepage';
 
-test("Currency change", async ({page}) => {
-    await page.goto("https://booking.com");
-    await page.getByTestId("header-currency-picker-trigger").click();
+test.describe('TestForBooking', () => {
+    let homepage: Homepage;
+    test.beforeEach(async ({page}) => {
+        homepage = new Homepage(page);
+        await homepage.goto();
+    })
 
-    await page.locator("data-testid=Suggested for you").getByText("EUR").click();
+    test("Currency change", async ({page}) => {
+        await homepage.selectEuroCurrency();
+        await expect(homepage.currencyButton).toContainText("EUR")
+    });
 
-    //await page.waitForURL("**/?selected_currency=*");
-    await expect(page.getByTestId("header-currency-picker-trigger")).toContainText("EUR");
-});
+    test("Language change", async ({page}) => {
 
-test("Language change", async ({page}) => {
-    await page.goto("https://booking.com");
-    await page.getByTestId("header-language-picker-trigger").click();
-    await page.locator("data-testid=Suggested for you").getByText("Polski").click();
-    await expect(page.getByTestId("header-custom-action-button")).toContainText("Udostępnij obiekt");
-    await page.goto("https://booking.com");
-    await page.getByTestId("header-language-picker-trigger").click();
-    await page.locator("data-testid=Wszystkie języki").getByText("Deutsch").click();
-    await expect(page.getByTestId("header-custom-action-button")).toContainText("Ihre Unterkunft anmelden");
+        await homepage.selectLanguage('pl');
+        await expect(homepage.registerYourPropertyButton).toContainText("Udostępnij obiekt");
 
-    await page.getByTestId("header-language-picker-trigger").click();
-    await page.locator("data-testid=Alle Sprachen").getByText("Srpski").click();
-    await expect(page.getByTestId("header-custom-action-button")).toContainText("Registrujte svoj objekat");
-
-});
+        await homepage.selectLanguage('de');
+        await expect(homepage.registerYourPropertyButton).toContainText("Ihre Unterkunft anmelden");
 
 
-test("Search for the city", async ({page}) => {
-    await page.goto("https://booking.com");
-    await page.locator("input[name=ss]").fill('Lviv');
+        await homepage.selectLanguage('sr');
+        await expect(homepage.registerYourPropertyButton).toContainText("Registrujte svoj objekat");
 
-    const firstAutocompleteOption = page.locator("#autocomplete-result-0");
-    await expect(firstAutocompleteOption).toContainText(/.*Lviv.*/);
-    await firstAutocompleteOption.click();
+    });
 
-    await page.locator("button[type=submit]").click();
-    await expect(page.locator("h1")).toContainText(/.*Lviv.*/);
+
+    test.only("Search for the city", async ({page}) => {
+
+        await homepage.searchByCity("Lviv");
+        await expect(page.locator("h1")).toContainText(/.*Lviv.*/);
+    })
 })
+
+
 
 
