@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "tests": "playwright test --config=playwright.config.ts",
-    "tests:headed": "playwright test --config=playwright.config.ts --headed"
+    "tests:headed": "playwright test --config=playwright.config.ts --headed",
+    "tests:api": "playwright test --config=api.config.ts"
   },
   "devDependencies": {
     "allure-playwright": "^3.2.1",
